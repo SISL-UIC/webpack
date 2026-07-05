@@ -16,6 +16,16 @@ it("should support webpackEntryOptions magic comment", () => {
 	expect(url.href).toMatch(/\.css$/);
 });
 
+it("should support webpackChunkName magic comment", () => {
+	const url = new URL(
+		/* webpackChunkName: "chunk-named-style" */
+		"./chunk-named.css",
+		import.meta.url
+	);
+	expect(url).toBeInstanceOf(URL);
+	expect(url.href).toMatch(/\.css$/);
+});
+
 it("should deduplicate entry blocks for the same CSS file", () => {
 	const url1 = new URL("./style.css", import.meta.url);
 	const url2 = new URL("./style.css", import.meta.url);

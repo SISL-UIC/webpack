@@ -6967,7 +6967,7 @@ declare interface EntryOptionPluginHooks {
 		undefined | string
 	>;
 }
-type EntryOptions = { name?: string } & Omit<
+type EntryOptions = { name?: string; standalone?: boolean } & Omit<
 	EntryDescriptionNormalized,
 	"import"
 >;

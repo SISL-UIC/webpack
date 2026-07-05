@@ -8,10 +8,10 @@ module.exports = {
 		const outputPath = options.output.path;
 		const files = fs.readdirSync(outputPath);
 		const cssFiles = files.filter((f) => f.endsWith(".css"));
-		// Each config produces 3 CSS files (style.css entry + named.css
-		// entry + link chunk). Both configs share the output directory,
-		// so link chunk filenames may collide.
-		const expectedMin = (i + 1) * 3 - i;
+		// Each config produces 4 CSS files (style.css entry + named.css
+		// entry + chunk-named.css entry + link chunk). Both configs share the
+		// output directory, so link chunk filenames may collide.
+		const expectedMin = (i + 1) * 4 - i;
 		if (cssFiles.length < expectedMin) {
 			throw new Error(
 				`Expected at least ${expectedMin} CSS files after config ${i}, got ${cssFiles.length}: ${cssFiles.join(", ")}`
@@ -30,6 +30,11 @@ module.exports = {
 		}
 		if (!allCss.includes(".named")) {
 			throw new Error("CSS files missing .named class from named.css");
+		}
+		if (!allCss.includes(".chunk-named")) {
+			throw new Error(
+				"CSS files missing .chunk-named class from chunk-named.css"
+			);
 		}
 		return [`bundle${i}.js`];
 	}
