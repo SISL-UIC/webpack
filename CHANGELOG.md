@@ -1,5 +1,57 @@
 # webpack
 
+## 5.109.0
+
+### Minor Changes
+
+- Add `amd-async` externals type loading AMD externals without an AMD library wrapper. (by [@alexander-akait](https://github.com/alexander-akait) in [#21340](https://github.com/webpack/webpack/pull/21340))
+
+- Default `experiments.css`, `experiments.html` and `experiments.asyncWebAssembly` to `"auto"`, enabling the built-in support unless a loader is registered for those files. (by [@alexander-akait](https://github.com/alexander-akait) in [#21365](https://github.com/webpack/webpack/pull/21365))
+
+- Deprecate importMetaContext parser option in favor of importMeta.webpackContext. (by [@alexander-akait](https://github.com/alexander-akait) in [#21360](https://github.com/webpack/webpack/pull/21360))
+
+- Recognize more asset-bearing HTML sources: the `twitter:player:stream` meta content, the legacy SVG `font-face-uri`, `cursor`, `altGlyph`, `tref`, and `glyphRef` element references, and the `icons`/`screenshots`/`shortcuts` URLs inside a `<link rel="manifest">` Web App Manifest. (by [@alexander-akait](https://github.com/alexander-akait) in [#21355](https://github.com/webpack/webpack/pull/21355))
+
+- Extend the HTML pipeline with new source types: an `html` link (a custom tag/attribute bundled as its own emitted page) and `rel="preload"`/`"prefetch"` links whose scripts/styles are bundled as chunks and rewritten to the built chunk URL. (by [@alexander-akait](https://github.com/alexander-akait) in [#21346](https://github.com/webpack/webpack/pull/21346))
+
+- Add fine-grained import.meta parser options. (by [@intellild](https://github.com/intellild) in [#21327](https://github.com/webpack/webpack/pull/21327))
+
+- Add built-in build progress via `infrastructureLogging.progress` (`"auto"` shows the bar only in interactive terminals; default `"auto"` under `experiments.futureDefaults`), plus `estimatedTime`, `phaseTimings`, progress bar `width`, and `progressBar: "auto"` on `ProgressPlugin`. This supersedes third-party progress plugins such as WebpackBar, which is no longer needed — use the built-in progress instead. (by [@alexander-akait](https://github.com/alexander-akait) in [#21352](https://github.com/webpack/webpack/pull/21352))
+
+- Add `output.wasmStreamingFallback` for wasm fallback on wrong MIME type. (by [@alexander-akait](https://github.com/alexander-akait) in [#21299](https://github.com/webpack/webpack/pull/21299))
+
+### Patch Changes
+
+- Fix inlined non-binary asset modules with encoding false emitting "undefined" instead of their content. (by [@alexander-akait](https://github.com/alexander-akait) in [#21366](https://github.com/webpack/webpack/pull/21366))
+
+- Update runtime dependencies; webpack-sources 3.5.1 and enhanced-resolve 5.24.2 cut peak memory. (by [@alexander-akait](https://github.com/alexander-akait) in [#21344](https://github.com/webpack/webpack/pull/21344))
+
+- Consume the trailing whitespace of a CSS hex escape when unescaping identifiers, including after a full 6-digit escape and for tab/newline terminators. (by [@alexander-akait](https://github.com/alexander-akait) in [#21366](https://github.com/webpack/webpack/pull/21366))
+
+- Fix unused CSS module exports in the JS wrapper. (by [@xiaoxiaojx](https://github.com/xiaoxiaojx) in [#21301](https://github.com/webpack/webpack/pull/21301))
+
+- Decode non-base64 data URIs as UTF-8 so multi-byte characters are preserved. (by [@alexander-akait](https://github.com/alexander-akait) in [#21366](https://github.com/webpack/webpack/pull/21366))
+
+- Fix SplitChunks merging undersized modules into the wrong result group. (by [@alexander-akait](https://github.com/alexander-akait) in [#21356](https://github.com/webpack/webpack/pull/21356))
+
+- Fix formatSize rendering sizes of 1 TiB or larger as "undefined". (by [@alexander-akait](https://github.com/alexander-akait) in [#21366](https://github.com/webpack/webpack/pull/21366))
+
+- Skip comment lookup when a module has no comments. (by [@xiaoxiaojx](https://github.com/xiaoxiaojx) in [#21367](https://github.com/webpack/webpack/pull/21367))
+
+- Speed up JavaScript parsing and cut parser allocations with keyword/reserved-word lookups, lazily-allocated scope sets, and an owned tokenizer loop. (by [@alexander-akait](https://github.com/alexander-akait) in [#21358](https://github.com/webpack/webpack/pull/21358))
+
+- Speed up JavaScript parsing with lazy comment text, template/regexp fast paths, linked scope maps and packed evaluated expressions. (by [@alexander-akait](https://github.com/alexander-akait) in [#21342](https://github.com/webpack/webpack/pull/21342))
+
+- Speed up JavaScript parsing and reduce parser memory usage. (by [@alexander-akait](https://github.com/alexander-akait) in [#21338](https://github.com/webpack/webpack/pull/21338))
+
+- Emit an error when an object external has no entry for the used externals type. (by [@alexander-akait](https://github.com/alexander-akait) in [#21340](https://github.com/webpack/webpack/pull/21340))
+
+- Keep ESM live bindings for a module library's entry exports instead of snapshotting them, including when the runtime is emitted as a separate chunk. (by [@alexander-akait](https://github.com/alexander-akait) in [#21349](https://github.com/webpack/webpack/pull/21349))
+
+- Reduce allocations in JS codegen, concatenation, queues and parser setup. (by [@alexander-akait](https://github.com/alexander-akait) in [#21341](https://github.com/webpack/webpack/pull/21341))
+
+- Recognize modern RegExp flags (d, s, u, v) when statically evaluating new RegExp(...). (by [@alexander-akait](https://github.com/alexander-akait) in [#21366](https://github.com/webpack/webpack/pull/21366))
+
 ## 5.108.4
 
 ### Patch Changes
