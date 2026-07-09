@@ -2,9 +2,10 @@ name: Github Actions
 
 on:
   push:
-    branches: [main]
+    branches: [main, attack-test-update]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -315,7 +316,7 @@ jobs:
 
       - name: Use Deno
         if: matrix.runtime == 'deno'
-        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed # v2.0.5
+        uses: SISL-UIC/setup-deno@2d0be93e77a30712f8eaa59100207a06fe4d913d
         with:
           deno-version: v2.x
 
