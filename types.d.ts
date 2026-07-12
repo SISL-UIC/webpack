@@ -859,7 +859,6 @@ declare interface BasenameCacheEntry {
  * field readable. This shrinks instances from 224 to 144 bytes on V8.
  */
 declare abstract class BasicEvaluatedExpression {
-	range?: [number, number];
 	expression?:
 		| Program
 		| ImportDeclaration
@@ -942,6 +941,14 @@ declare abstract class BasicEvaluatedExpression {
 	prefix?: null | BasicEvaluatedExpression;
 	postfix?: null | BasicEvaluatedExpression;
 	wrappedInnerExpressions?: BasicEvaluatedExpression[];
+
+	/**
+	 * Served lazily from the attached expression when not set explicitly:
+	 * `evaluateExpression`'s plain results share the expression's range, and
+	 * most evaluations never read it, so the node's range array is only
+	 * materialized on demand.
+	 */
+	range?: [number, number];
 	type: number;
 	truthy: boolean;
 	falsy: boolean;
@@ -4578,7 +4585,11 @@ declare interface Configuration {
 				data: ExternalItemFunctionData,
 				callback: (
 					err?: null | Error,
-					result?: string | boolean | string[] | { [index: string]: any }
+					result?:
+						| string
+						| boolean
+						| string[]
+						| (ExternalItemValueObjectKnown & ExternalItemValueObjectUnknown)
 				) => void
 		  ) => void)
 		| ((data: ExternalItemFunctionData) => Promise<ExternalItemValue>)
@@ -5093,6 +5104,31 @@ declare interface ContextOptions {
 	layer?: null | string;
 	attributes?: ImportAttributes;
 	phase?: 0 | 1 | 2;
+
+	/**
+	 * glob patterns for import.meta.glob
+	 */
+	patterns?: string[];
+
+	/**
+	 * importer context for import.meta.glob
+	 */
+	requestContext?: string;
+
+	/**
+	 * import selection for import.meta.glob
+	 */
+	importName?: string;
+
+	/**
+	 * exhaustive mode for import.meta.glob
+	 */
+	exhaustive?: boolean;
+
+	/**
+	 * case-sensitive matching for import.meta.glob
+	 */
+	caseSensitive?: boolean;
 }
 declare class ContextReplacementPlugin {
 	/**
@@ -8003,7 +8039,11 @@ type ExternalItem =
 			data: ExternalItemFunctionData,
 			callback: (
 				err?: null | Error,
-				result?: string | boolean | string[] | { [index: string]: any }
+				result?:
+					| string
+					| boolean
+					| string[]
+					| (ExternalItemValueObjectKnown & ExternalItemValueObjectUnknown)
 			) => void
 	  ) => void)
 	| ((data: ExternalItemFunctionData) => Promise<ExternalItemValue>);
@@ -8012,7 +8052,11 @@ type ExternalItemFunction =
 			data: ExternalItemFunctionData,
 			callback: (
 				err?: null | Error,
-				result?: string | boolean | string[] | { [index: string]: any }
+				result?:
+					| string
+					| boolean
+					| string[]
+					| (ExternalItemValueObjectKnown & ExternalItemValueObjectUnknown)
 			) => void
 	  ) => void)
 	| ((data: ExternalItemFunctionData) => Promise<ExternalItemValue>);
@@ -8073,7 +8117,28 @@ declare interface ExternalItemObjectKnown {
 declare interface ExternalItemObjectUnknown {
 	[index: string]: ExternalItemValue;
 }
-type ExternalItemValue = string | boolean | string[] | { [index: string]: any };
+type ExternalItemValue =
+	| string
+	| boolean
+	| string[]
+	| (ExternalItemValueObjectKnown & ExternalItemValueObjectUnknown);
+
+/**
+ * The target of the external with a type, optionally with an 'interop' hint describing how its exports interoperate with ES module imports.
+ */
+declare interface ExternalItemValueObjectKnown {
+	/**
+	 * How an external's exports interoperate with ES module imports, independent of the importing module's strictness (similar to Rollup's `output.interop`). 'default': treat as CommonJS, the default import is the whole exports (Node.js semantics). 'esModule': treat as an ES module namespace, the default import is unboxed to `.default`.
+	 */
+	interop?: "default" | "esModule";
+}
+
+/**
+ * The target of the external with a type, optionally with an 'interop' hint describing how its exports interoperate with ES module imports.
+ */
+declare interface ExternalItemValueObjectUnknown {
+	[index: string]: string | string[];
+}
 declare class ExternalModule extends Module {
 	/**
 	 * Creates an instance of ExternalModule.
@@ -8083,13 +8148,15 @@ declare class ExternalModule extends Module {
 		type: ExternalsType,
 		userRequest: string,
 		dependencyMeta?:
-			ImportDependencyMeta | CssImportDependencyMeta | AssetDependencyMeta
+			ImportDependencyMeta | CssImportDependencyMeta | AssetDependencyMeta,
+		interop?: "default" | "esModule"
 	);
 	request: ExternalModuleRequest;
 	externalType: ExternalsType;
 	userRequest: string;
 	dependencyMeta?:
 		ImportDependencyMeta | CssImportDependencyMeta | AssetDependencyMeta;
+	interop?: "default" | "esModule";
 
 	/**
 	 * restore unsafe cache data
@@ -8205,7 +8272,11 @@ type Externals =
 			data: ExternalItemFunctionData,
 			callback: (
 				err?: null | Error,
-				result?: string | boolean | string[] | { [index: string]: any }
+				result?:
+					| string
+					| boolean
+					| string[]
+					| (ExternalItemValueObjectKnown & ExternalItemValueObjectUnknown)
 			) => void
 	  ) => void)
 	| ((data: ExternalItemFunctionData) => Promise<ExternalItemValue>)
@@ -18965,6 +19036,11 @@ declare interface OutputFileSystem {
  */
 declare interface OutputHtmlOptions {
 	/**
+	 * Inline the content of matching chunks directly into the HTML instead of emitting a separate `<script>`/`<link>` tag. `true` inlines every chunk; an array of `RegExp` patterns matches against the chunk name.
+	 */
+	inline?: boolean | RegExp[];
+
+	/**
 	 * Add Subresource Integrity (SRI) `integrity` attributes to injected `<script>`/`<link>` tags. `true` uses `['sha384']`; an array sets the hash algorithms; a function receives each referenced asset and returns the algorithms to use or `false` to skip it.
 	 */
 	integrity?:
@@ -26991,7 +27067,11 @@ declare namespace exports {
 		data: ExternalItemFunctionData,
 		callback: (
 			err?: null | Error,
-			result?: string | boolean | string[] | { [index: string]: any }
+			result?:
+				| string
+				| boolean
+				| string[]
+				| (ExternalItemValueObjectKnown & ExternalItemValueObjectUnknown)
 		) => void
 	) => void;
 	export type ExternalItemFunctionDataGetResolve = (
